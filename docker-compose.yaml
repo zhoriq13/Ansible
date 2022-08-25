@@ -1,0 +1,45 @@
+version: "3.8"
+services:
+  server1:
+    build: ./docker/flask
+    container_name: server_1
+    # ports:
+    #   - "5000:5000"
+    networks:
+      default:
+        ipv4_address: 172.20.1.1
+
+
+  server2:
+    build: ./docker/flask
+    container_name: server_2
+    # ports:
+    #   - "5000:5000"
+    networks:
+      default:
+        ipv4_address: 172.20.1.2
+  
+
+  nginx:
+    build: ./docker/nginx
+    container_name: nginx-flask
+    restart: always
+    ports:
+      - "80:80"
+
+  haproxy:
+    image: "haproxy:2.2-alpine"
+    container_name: HA_Proxy
+    ports:
+      - 5000:5000
+#      - 443:443
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+#      - ./cert.pem:/etc/ssl/certs/site.pem
+
+networks:
+  default:
+    external:
+      name: develop
